@@ -1,2 +1,2 @@
 Yes
-![](screenshot.png)
+![](.screen.png)
