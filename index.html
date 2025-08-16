@@ -1,0 +1,53 @@
+<body>
+<script src="code.js"></script>
+</body>
+
+<div style="display: flex; flex-direction: row;">
+    <div style="display: flex; flex-direction: column;width: 50%; padding: 10px">
+        <label>Bits(m)</label>
+        <input oninput="renderFalsePositive()" id="bits" type="number" min="1" placeholder="Bits(m)" value="4096"/>
+        <label>Hashes(k)</label>
+        <input oninput="renderFalsePositive()" id="hashes" type="number" min="1" placeholder="Hashes(k)" value="2"/>
+        <label>Items(n)</label>
+        <input oninput="renderFalsePositive()" id="items" type="number" min="1" placeholder="Items(n)" value="500"/>
+        <label>Iterations per rendered frame</label>
+        <input id="iterations" type="number" placeholder="iterations" min="1" value="50"/>
+
+    </div>
+    <div style="display: flex; flex-direction: column;width: 50%; padding: 10px">
+        <label id="checks">checks: </label>
+        <label id="hits">hits: </label>
+        <label id="misses">misses: </label>
+        <label id="rate">Theoretical false positive rate: </label>
+    </div>
+</div>
+<h2 id="falsePositive"></h2>
+<button onclick="startSim()">Run Simulation</button>
+<p>Green = Likely to exist and hit</p>
+<p>Red = Likely to exist and miss</p>
+<script defer>
+    //  k: The number of hash functions.
+    //  n: The number of items in the filter.
+    //  m: The size of the bit array.
+    function calculateFalsePositiveRate(k, n, m) {
+        if (k <= 0 || n <= 0 || m <= 0) {
+            throw new Error(`Invalid args k: ${k} n: ${n} m: ${m}`);
+        }
+        // p = (1 - e^(-kn/m))^k
+        const exponent = -k * n / m;
+        const base = 1 - Math.exp(exponent);
+        return Math.pow(base, k);
+    }
+
+    function renderFalsePositive() {
+        if(hashes.value && items.value && bits.value) {
+            update()
+        }
+    }
+    function update() {
+            const rate = calculateFalsePositiveRate(hashes.value, items.value, bits.value)
+          falsePositive.textContent = "Theoretical false positive probability: " + (rate*100).toFixed(2) + "%"
+    }
+    update()
+
+</script>
